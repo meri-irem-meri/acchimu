@@ -1,0 +1,144 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>めりのたのしいたのしいあっちむいてほいゲーム</title>
+  <style>
+    body {
+      background-color: black;
+      color: red;
+      font-family: sans-serif;
+      text-align: center;
+      padding: 20px;
+    }
+    button {
+      margin: 10px;
+      padding: 20px;
+      font-size: 20px;
+      background-color: #111;
+      color: red;
+      border: 2px solid red;
+      border-radius: 8px;
+      width: 200px;
+    }
+    img {
+      width: 120px;
+      margin-top: 20px;
+    }
+    #countdown {
+      font-size: 40px;
+      margin-top: 20px;
+    }
+  </style>
+</head>
+<body>
+  <div id="start-screen">
+    <h1 style="font-size: 2em; color: red;">
+      めりのたのしいたのしい<br />あっちむいてほいゲーム
+    </h1>
+    <button onclick="showRoleSelection()">ゲームスタート</button>
+  </div>
+
+  <div id="role-selection" style="display:none;">
+    <h2>あなたの役割は？</h2>
+    <button onclick="startGame('attacker')">ほいする</button>
+    <button onclick="startGame('defender')">ほいされる</button>
+  </div>
+
+  <div id="game-screen" style="display:none;">
+    <h2>方向を選んでください</h2>
+    <div>
+      <button onclick="chooseDirection('up')">上</button>
+      <button onclick="chooseDirection('down')">下</button>
+      <button onclick="chooseDirection('left')">左</button>
+      <button onclick="chooseDirection('right')">右</button>
+    </div>
+  </div>
+
+  <div id="who-won-screen" style="display:none;">
+    <h2 style="font-size: 30px;">勝ったのは～？</h2>
+    <div id="countdown">2</div>
+  </div>
+
+  <div id="result-screen" style="display:none;">
+    <h2 id="result-message"></h2>
+    <p id="result-detail"></p>
+    <img id="opponent-image" src="" alt="相手の画像">
+    <br>
+    <button onclick="startGame()">再戦</button>
+    <button onclick="goToStart()">最初に戻る</button>
+  </div>
+
+  <script>
+    let playerRole = '';
+    let playerChoice = '';
+    let opponentChoice = '';
+
+    function showRoleSelection() {
+      document.getElementById("start-screen").style.display = "none";
+      document.getElementById("role-selection").style.display = "block";
+    }
+
+    function startGame(role) {
+      if (role) playerRole = role;
+      document.getElementById("role-selection").style.display = "none";
+      document.getElementById("result-screen").style.display = "none";
+      document.getElementById("game-screen").style.display = "block";
+    }
+
+    function chooseDirection(direction) {
+      playerChoice = direction;
+      opponentChoice = getRandomDirection();
+      document.getElementById("game-screen").style.display = "none";
+      showWhoWonScreen();
+    }
+
+    function showWhoWonScreen() {
+      document.getElementById("who-won-screen").style.display = "block";
+      let count = 2;
+      document.getElementById("countdown").innerText = count;
+      const interval = setInterval(() => {
+        count--;
+        document.getElementById("countdown").innerText = count;
+        if (count <= 0) {
+          clearInterval(interval);
+          document.getElementById("who-won-screen").style.display = "none";
+          showResult();
+        }
+      }, 1000);
+    }
+
+    function showResult() {
+      const isWin = (playerRole === 'attacker' && playerChoice === opponentChoice) ||
+                    (playerRole === 'defender' && playerChoice !== opponentChoice);
+
+      document.getElementById("result-message").innerText = isWin ? "YOU WIN" : "YOU LOSE";
+      document.getElementById("result-detail").innerText = `あなた: ${playerChoice}\n相手: ${opponentChoice}`;
+      document.getElementById("opponent-image").src = getImage(opponentChoice, playerRole === 'attacker' ? 'face' : 'point');
+      document.getElementById("result-screen").style.display = "block";
+
+      // エフェクト（シンプルに背景色変化で代用）
+      document.body.style.backgroundColor = isWin ? 'black' : '#330000';
+    }
+
+    function getRandomDirection() {
+      const directions = ['up', 'down', 'left', 'right'];
+      return directions[Math.floor(Math.random() * directions.length)];
+    }
+
+    function getImage(direction, type) {
+      return `images/${type}_${direction}.png`;
+    }
+
+    function goToStart() {
+      document.getElementById("result-screen").style.display = "none";
+      document.getElementById("role-selection").style.display = "none";
+      document.getElementById("game-screen").style.display = "none";
+      document.getElementById("who-won-screen").style.display = "none";
+      document.getElementById("start-screen").style.display = "block";
+      document.body.style.backgroundColor = 'black';
+    }
+  </script>
+</body>
+</html>
